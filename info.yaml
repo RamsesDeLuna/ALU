@@ -21,34 +21,34 @@ project:
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
   # Inputs
-  ui[0]: ""  # Unused
-  ui[1]: ""  # Unused
-  ui[2]: ""  # Unused
-  ui[3]: ""  # Unused
-  ui[4]: ""  # Unused
-  ui[5]: ""  # Unused
-  ui[6]: ""  # Unused
-  ui[7]: ""  # Unused
+  ui[0]: "PIN_A1"
+  ui[1]: "PIN_A2"
+  ui[2]: "PIN_A3"
+  ui[3]: "PIN_A4"
+  ui[4]: "PIN_A5"
+  ui[5]: "PIN_A6"
+  ui[6]: "PIN_A7"
+  ui[7]: "PIN_A8"
 
   # Outputs
-  uo[0]: ""  # Unused
-  uo[1]: ""  # Unused
-  uo[2]: ""  # Unused
-  uo[3]: ""  # Unused
-  uo[4]: ""  # Unused
-  uo[5]: ""  # Unused
-  uo[6]: ""  # Unused
-  uo[7]: ""  # Unused
+  uo[0]: "PIN_B1"
+  uo[1]: "PIN_B2"
+  uo[2]: "PIN_B3"
+  uo[3]: "PIN_B4"
+  uo[4]: "PIN_B5"
+  uo[5]: "PIN_B6"
+  uo[6]: "PIN_B7"
+  uo[7]: "PIN_B8"
 
   # Bidirectional pins
-  uio[0]: ""  # Unused
-  uio[1]: ""  # Unused
-  uio[2]: ""  # Unused
-  uio[3]: ""  # Unused
-  uio[4]: ""  # Unused
-  uio[5]: ""  # Unused
-  uio[6]: ""  # Unused
-  uio[7]: ""  # Unused
+  uio[0]: "PIN_C1"
+  uio[1]: "PIN_C2"
+  uio[2]: "PIN_C3"
+  uio[3]: "PIN_C4"
+  uio[4]: "PIN_C5"
+  uio[5]: "PIN_C6"
+  uio[6]: "PIN_C7"
+  uio[7]: "PIN_C8"
 
 # Do not change!
 yaml_version: 6
