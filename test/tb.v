@@ -1,45 +1,48 @@
-`default_nettype none
-`timescale 1ns / 1ps
+module tb;
 
-/* This testbench just instantiates the module and makes some convenient wires
-   that can be driven / tested by the cocotb test.py.
-*/
-module tb ();
+    reg clk;
+    reg reset;
+    reg ena;  // Señal de habilitación
+    reg [3:0] in_data;
+    reg ui_in;   // Añadir el puerto ui_in en el testbench
+    wire [3:0] out_data;
 
-  // Dump the signals to a VCD file. You can view it with gtkwave.
-  initial begin
-    $dumpfile("tb.vcd");
-    $dumpvars(0, tb);
-    #1;
-  end
+    // Instanciación del módulo tt_um_example
+    project.v (
+        .clk(clk),
+        .reset(reset),
+        .ena(ena),        // Conectar 'ena'
+        .in_data(in_data),
+        .ui_in(ui_in),    // Conectar 'ui_in' aquí
+        .out_data(out_data)
+    );
 
-  // Wire up the inputs and outputs:
-  reg clk;
-  reg rst_n;
-  reg ena;
-  reg [7:0] ui_in;
-  reg [7:0] uio_in;
-  wire [7:0] uo_out;
-  wire [7:0] uio_out;
-  wire [7:0] uio_oe;
+    // Generación de señales de reloj
+    always #5 clk = ~clk;
 
-  // Replace tt_um_example with your module name:
-  tt_um_example user_project (
+    initial begin
+        // Inicialización de señales
+        clk = 0;
+        reset = 0;
+        ena = 0;  // Deshabilitado por defecto
+        in_data = 4'b1010;
+        ui_in = 1; // Inicialización del puerto ui_in
 
-      // Include power ports for the Gate Level test:
-`ifdef GL_TEST
-      .VPWR(1'b1),
-      .VGND(1'b0),
-`endif
+        // Aplicar reset
+        reset = 1;
+        #10 reset = 0;
 
-      .ui_in  (ui_in),    // Dedicated inputs
-      .uo_out (uo_out),   // Dedicated outputs
-      .uio_in (uio_in),   // IOs: Input path
-      .uio_out(uio_out),  // IOs: Output path
-      .uio_oe (uio_oe),   // IOs: Enable path (active high: 0=input, 1=output)
-      .ena    (ena),      // enable - goes high when design is selected
-      .clk    (clk),      // clock
-      .rst_n  (rst_n)     // not reset
-  );
+        // Habilitar 'ena' y verificar la salida
+        ena = 1;
+        #10 ena = 0;
+        #10 ena = 1;
+
+        // Continuar con las simulaciones
+        #10 $finish;
+    end
+
+    initial begin
+        $monitor("Time: %0t | ena: %b | in_data: %b | ui_in: %b | out_data: %b", $time, ena, in_data, ui_in, out_data);
+    end
 
 endmodule

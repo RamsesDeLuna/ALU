@@ -1,27 +1,100 @@
-/*
- * Copyright (c) 2024 Your Name
- * SPDX-License-Identifier: Apache-2.0
- */
-
 `default_nettype none
 
-module tt_um_example (
-    input  wire [7:0] ui_in,    // Dedicated inputs
-    output wire [7:0] uo_out,   // Dedicated outputs
-    input  wire [7:0] uio_in,   // IOs: Input path
-    output wire [7:0] uio_out,  // IOs: Output path
-    output wire [7:0] uio_oe,   // IOs: Enable path (active high: 0=input, 1=output)
-    input  wire       ena,      // always 1 when the design is powered, so you can ignore it
-    input  wire       clk,      // clock
-    input  wire       rst_n     // reset_n - low to reset
+// Módulo ALU
+module ALU #(
+  parameter WIDTH = 3
+)(
+  input wire [WIDTH-1:0] in1, in2,       // Entradas A y B de la ALU (in1 e in2)
+  input wire [1:0] op,                   // Código de operación
+  output reg [3:0] dec_bin,              // Decenas del resultado
+  output reg [3:0] unis_bin,             // Unidades del resultado
+  output reg zero,                       // Señal de resultado cero (flag zero)
+  output reg error                       // Señal de error (flag error división por cero o datos inválidos)
 );
 
-  // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+reg [5:0] out;                           // Variable para almacenar el resultado de la operación en decimal
+reg [3:0] decenas_dec, unidades_dec;     // Variables para separar las unidades y decenas en decimal
 
-  // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+// Definición de operaciones para el selector
+localparam SUM = 2'b00;
+localparam SUB = 2'b01;
+localparam MUL = 2'b10;
+localparam DIV = 2'b11;
 
+always @(*) begin
+  error = 0;
+  zero = 0;
+  
+  case (op)
+    SUM: begin
+      out = in1 + in2;
+      decenas_dec = out / 10;
+      unidades_dec = out % 10;
+      dec_bin = decenas_dec;
+      unis_bin = unidades_dec;
+    end
+    SUB: begin
+      if (in1 >= in2) begin
+        out = in1 - in2;
+        decenas_dec = out / 10;
+        unidades_dec = out % 10;
+        dec_bin = decenas_dec;
+        unis_bin = unidades_dec;
+      end else begin
+        error = 1;
+        out = 6'b000000;
+        dec_bin = 4'b0000;
+        unis_bin = 4'b0000;
+      end
+    end
+    MUL: begin
+      out = in1 * in2;
+      decenas_dec = out / 10;
+      unidades_dec = out % 10;
+      dec_bin = decenas_dec;
+      unis_bin = unidades_dec;
+    end
+    DIV: begin
+      if (in2 == 0) begin
+        error = 1;
+        out = 6'b111111;
+        dec_bin = 4'b1111;
+        unis_bin = 4'b1111;
+      end else begin
+        out = in1 / in2;
+        decenas_dec = out / 10;
+        unidades_dec = out % 10;
+        dec_bin = decenas_dec;
+        unis_bin = unidades_dec;
+      end
+    end
+    default: begin
+      error = 1;
+      out = 6'b111111;
+      dec_bin = 4'b1111;
+      unis_bin = 4'b1111;
+    end
+  endcase
+
+  if (out == 0) zero = 1;
+end
+
+endmodule
+
+// Módulo tt_um_example (Ejemplo simple)
+module tt_um_example (
+    input wire clk,              // Reloj de entrada
+    input wire rst_n,            // Reset (activo bajo)
+    input wire ena,              // Puerto habilitador
+    input wire [3:0] in_data,    // Datos de entrada
+    output reg [3:0] out_data    // Datos de salida
+);
+
+    // Ejemplo de lógica del módulo tt_um_example
+    always @(posedge clk or negedge rst_n) begin  // Cambié 'posedge reset' a 'negedge rst_n'
+        if (~rst_n)  // Reset activo bajo
+            out_data <= 4'b0000;  // Resetear salida a 0000 cuando el reset sea activo bajo
+        else if (ena)             // Propagar solo cuando 'ena' esté activo
+            out_data <= in_data; // Propagar entrada a salida
+    end
 endmodule
